@@ -3,12 +3,12 @@ import Dexie from "dexie";
 
 export const db = new Dexie("NourinNEET");
 
-db.version(1).stores({
+db.version(2).stores({
   tasks: "++id, title, done, createdAt",
   subjects: "name",
   chapters: "++id, subject, title, status",
   timetable: "++id, date, startTime",
-  testScores: "++id, date, subject, score",
+  testScores: "++id, date, totalScore",
 });
 
 export async function seedInitialTasks(tasks) {

@@ -42,6 +42,12 @@ function App() {
   const [tasks, setTasks] = useState([]);
   const [chapters, setChapters] = useState([]);
   const [studySessions, setStudySessions] = useState([]);
+  const [testScores, setTestScores] = useState([]);
+  const [testName, setTestName] = useState("");
+  const [testDate, setTestDate] = useState(getLocalDate());
+  const [physicsMarks, setPhysicsMarks] = useState("");
+  const [chemistryMarks, setChemistryMarks] = useState("");
+  const [biologyMarks, setBiologyMarks] = useState("");
   const [chapterTitle, setChapterTitle] = useState("");
   const [selectedDate, setSelectedDate] = useState(getLocalDate());
   const [sessionSubject, setSessionSubject] = useState("Biology");
@@ -59,17 +65,19 @@ function App() {
         await seedInitialTasks(initialTasks);
         await seedOfficialSyllabus(syllabus);
 
-        const [savedTasks, savedChapters, savedSessions] =
+        const [savedTasks, savedChapters, savedSessions, savedTestScores] =
           await Promise.all([
             db.tasks.toArray(),
             db.chapters.toArray(),
             db.timetable.toArray(),
+            db.testScores.toArray(),
           ]);
 
         if (active) {
           setTasks(savedTasks);
           setChapters(savedChapters);
           setStudySessions(savedSessions);
+          setTestScores(savedTestScores);
         }
       } catch (err) {
         console.error("Could not load local data:", err);
@@ -233,6 +241,71 @@ function App() {
     }
   }
 
+
+  async function addMockTest(event) {
+    event.preventDefault();
+
+    const name = testName.trim();
+    if (!name || !testDate) {
+      setError("Enter a test name and choose the test date.");
+      return;
+    }
+
+    if ([physicsMarks, chemistryMarks, biologyMarks].some((mark) => mark === "")) {
+      setError("Enter marks for all three subjects.");
+      return;
+    }
+
+    const physics = Number(physicsMarks);
+    const chemistry = Number(chemistryMarks);
+    const biology = Number(biologyMarks);
+    const validMarks =
+      Number.isInteger(physics) && physics >= 0 && physics <= 180 &&
+      Number.isInteger(chemistry) && chemistry >= 0 && chemistry <= 180 &&
+      Number.isInteger(biology) && biology >= 0 && biology <= 360;
+
+    if (!validMarks) {
+      setError("Enter whole-number marks within the maximum for each subject: Physics 180, Chemistry 180, Biology 360.");
+      return;
+    }
+
+    try {
+      const record = {
+        name,
+        date: testDate,
+        physics,
+        chemistry,
+        biology,
+        totalScore: physics + chemistry + biology,
+        createdAt: new Date().toISOString(),
+      };
+      const id = await db.testScores.add(record);
+      setTestScores((current) => [...current, { ...record, id }]);
+      setTestName("");
+      setPhysicsMarks("");
+      setChemistryMarks("");
+      setBiologyMarks("");
+      setError("");
+    } catch (err) {
+      console.error(err);
+      setError("Couldn't save the mock test. Please try again.");
+    }
+  }
+
+  async function deleteMockTest(id) {
+    const confirmed = window.confirm("Delete this mock test result?");
+    if (!confirmed) return;
+
+    try {
+      await db.testScores.delete(id);
+      setTestScores((current) => current.filter((test) => test.id !== id));
+      setError("");
+    } catch (err) {
+      console.error(err);
+      setError("Couldn't delete this mock test.");
+    }
+  }
+
   const subjectChapters = useMemo(
     () => chapters.filter((chapter) => chapter.subject === activeSubject),
     [chapters, activeSubject]
@@ -266,6 +339,23 @@ function App() {
   const completedSessions = dailySessions.filter(
     (session) => session.done
   ).length;
+
+  const sortedTestScores = useMemo(
+    () => [...testScores].sort((a, b) => b.date.localeCompare(a.date) || (b.id ?? 0) - (a.id ?? 0)),
+    [testScores]
+  );
+  const bestTestScore = testScores.length
+    ? Math.max(...testScores.map((test) => Number(test.totalScore) || 0))
+    : null;
+  const latestTestScore = sortedTestScores[0] ?? null;
+  const previewMarks = [physicsMarks, chemistryMarks, biologyMarks];
+  const previewIsValid = previewMarks.every((mark) => mark !== "" && Number.isInteger(Number(mark))) &&
+    Number(physicsMarks) >= 0 && Number(physicsMarks) <= 180 &&
+    Number(chemistryMarks) >= 0 && Number(chemistryMarks) <= 180 &&
+    Number(biologyMarks) >= 0 && Number(biologyMarks) <= 360;
+  const previewTotal = previewIsValid
+    ? Number(physicsMarks) + Number(chemistryMarks) + Number(biologyMarks)
+    : null;
 
   return (
     <main className="app-shell">
@@ -303,6 +393,13 @@ function App() {
           onClick={() => setView("timetable")}
         >
           <span>◷</span> Study timetable
+        </button>
+
+        <button
+          className={view === "tests" ? "nav-button active" : "nav-button"}
+          onClick={() => setView("tests")}
+        >
+          <span>↗</span> Mock tests
         </button>
       </nav>
 
@@ -610,6 +707,124 @@ function App() {
             Your list is editable. Verify chapter coverage against the official
             NEET syllabus for your exam year.
           </p>
+        </section>
+      ) : view === "tests" ? (
+        <section className="test-page">
+          <div className="syllabus-intro">
+            <p className="eyebrow">PRACTISE, REVIEW, IMPROVE ✨</p>
+            <h1>Mock <span>tests.</span></h1>
+            <p className="welcome-copy">
+              Record NEET mock test marks and follow your progress. Your results are saved on this device.
+            </p>
+          </div>
+
+          <div className="test-summary-grid">
+            <article className="test-summary-card">
+              <span>Latest score</span>
+              <strong>{latestTestScore ? `${latestTestScore.totalScore}/720` : "—"}</strong>
+              <small>{latestTestScore ? latestTestScore.name : "No tests recorded yet"}</small>
+            </article>
+            <article className="test-summary-card">
+              <span>Personal best</span>
+              <strong>{bestTestScore !== null ? `${bestTestScore}/720` : "—"}</strong>
+              <small>Keep building on it 🌷</small>
+            </article>
+            <article className="test-summary-card">
+              <span>Tests recorded</span>
+              <strong>{testScores.length}</strong>
+              <small>Every attempt counts</small>
+            </article>
+          </div>
+
+          <div className="test-form-card">
+            <div className="chapter-list-heading">
+              <div>
+                <p className="eyebrow">NEW RESULT</p>
+                <h2>Add a mock test</h2>
+              </div>
+              <span className="soft-label">Maximum 720 marks</span>
+            </div>
+
+            <form className="test-form" onSubmit={addMockTest}>
+              <div className="test-form-grid">
+                <div>
+                  <label htmlFor="test-name">Test name</label>
+                  <input id="test-name" type="text" placeholder="e.g. Full syllabus test 1" value={testName} onChange={(event) => setTestName(event.target.value)} required />
+                </div>
+                <div>
+                  <label htmlFor="test-date">Test date</label>
+                  <input id="test-date" type="date" value={testDate} onChange={(event) => setTestDate(event.target.value)} required />
+                </div>
+              </div>
+
+              <div className="test-subject-grid">
+                <div className="test-mark-field physics-mark">
+                  <label htmlFor="physics-marks">⚡ Physics <span>/ 180</span></label>
+                  <input id="physics-marks" type="number" min="0" max="180" step="1" inputMode="numeric" placeholder="0–180" value={physicsMarks} onChange={(event) => setPhysicsMarks(event.target.value)} required />
+                </div>
+                <div className="test-mark-field chemistry-mark">
+                  <label htmlFor="chemistry-marks">🧪 Chemistry <span>/ 180</span></label>
+                  <input id="chemistry-marks" type="number" min="0" max="180" step="1" inputMode="numeric" placeholder="0–180" value={chemistryMarks} onChange={(event) => setChemistryMarks(event.target.value)} required />
+                </div>
+                <div className="test-mark-field biology-mark">
+                  <label htmlFor="biology-marks">🌿 Biology <span>/ 360</span></label>
+                  <input id="biology-marks" type="number" min="0" max="360" step="1" inputMode="numeric" placeholder="0–360" value={biologyMarks} onChange={(event) => setBiologyMarks(event.target.value)} required />
+                </div>
+              </div>
+
+              <div className="test-total-preview">
+                <span>Total score</span>
+                <strong>{previewTotal !== null ? `${previewTotal} / 720` : "— / 720"}</strong>
+              </div>
+              <button type="submit" className="primary-button">+ Save mock test</button>
+            </form>
+          </div>
+
+          <div className="chapter-list-heading test-history-heading">
+            <div>
+              <p className="eyebrow">YOUR PROGRESS</p>
+              <h2>Test history</h2>
+            </div>
+            <span className="soft-label">{testScores.length} saved</span>
+          </div>
+
+          {sortedTestScores.length === 0 ? (
+            <div className="empty-chapters">
+              <span>📝</span>
+              <h3>Your first result starts here</h3>
+              <p>After a mock test, add your marks above to build your score history.</p>
+            </div>
+          ) : (
+            <div className="test-history-list">
+              {sortedTestScores.map((test) => (
+                <article className="test-history-card" key={test.id}>
+                  <div className="test-history-top">
+                    <div>
+                      <h3>{test.name}</h3>
+                      <p>{formatDate(test.date)}</p>
+                    </div>
+                    <div className="test-history-total">
+                      <strong>{test.totalScore}<span>/720</span></strong>
+                      <small>{Math.round((test.totalScore / 720) * 100)}%</small>
+                    </div>
+                  </div>
+                  <div className="test-score-track" aria-label={`Score ${test.totalScore} out of 720`}>
+                    <div className="test-score-fill" style={{ width: `${Math.max(0, Math.min(100, (Number(test.totalScore) / 720) * 100))}%` }} />
+                  </div>
+                  <div className="test-subject-results">
+                    <span>Physics <strong>{test.physics}/180</strong></span>
+                    <span>Chemistry <strong>{test.chemistry}/180</strong></span>
+                    <span>Biology <strong>{test.biology}/360</strong></span>
+                  </div>
+                  <div className="test-history-actions">
+                    <small>{test.totalScore >= 600 ? "Great effort — keep going! 🌟" : "Review mistakes and try again 🌱"}</small>
+                    <button className="delete-chapter" onClick={() => deleteMockTest(test.id)} aria-label={`Delete ${test.name}`} title="Delete test result">×</button>
+                  </div>
+                </article>
+              ))}
+            </div>
+          )}
+          <p className="syllabus-footnote">NEET subject maximums used here: Physics 180, Chemistry 180, Biology 360.</p>
         </section>
       ) : (
         <section className="timetable-page">

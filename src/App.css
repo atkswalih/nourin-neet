@@ -496,3 +496,426 @@ footer span {
     transition-duration: 0.01ms !important;
   }
 }
+
+
+/* Main app navigation */
+.app-navigation {
+  display: flex;
+  gap: 8px;
+  padding: 16px 0 0;
+}
+
+.nav-button {
+  border: 1px solid transparent;
+  border-radius: 12px;
+  padding: 11px 15px;
+  background: transparent;
+  color: #81788f;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.nav-button span {
+  margin-right: 5px;
+}
+
+.nav-button.active {
+  background: #eee7fa;
+  color: #725d9f;
+  border-color: #e4d9f7;
+}
+
+.app-error {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-top: 16px;
+  padding: 12px 15px;
+  background: #fff0ef;
+  border: 1px solid #f3d6d3;
+  border-radius: 12px;
+  color: #984c48;
+  font-size: 12px;
+}
+
+.app-error button {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.loading-state {
+  padding: 60px 10px;
+  text-align: center;
+  color: #82788f;
+}
+
+/* Subject cards are now navigation buttons */
+.subject-card-button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  transition: transform 160ms ease, box-shadow 160ms ease;
+}
+
+.subject-card-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px #4d37600c;
+}
+
+.subject-card-button:focus-visible,
+.nav-button:focus-visible,
+.syllabus-tab:focus-visible,
+.primary-button:focus-visible,
+.delete-chapter:focus-visible {
+  outline: 3px solid #a89ad9;
+  outline-offset: 3px;
+}
+
+/* Syllabus page */
+.syllabus-page {
+  padding-top: 34px;
+}
+
+.syllabus-intro h1 {
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: clamp(38px, 6vw, 52px);
+  line-height: 1.15;
+  letter-spacing: -1.4px;
+  margin: 0 0 12px;
+}
+
+.syllabus-intro h1 span {
+  color: #9986c9;
+}
+
+.syllabus-intro .welcome-copy {
+  margin-bottom: 24px;
+}
+
+.syllabus-subject-tabs {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 9px;
+  margin-bottom: 18px;
+}
+
+.syllabus-tab {
+  border: 1px solid #eee7f2;
+  border-radius: 13px;
+  padding: 12px 8px;
+  background: #fff;
+  color: #777083;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.syllabus-tab span {
+  margin-right: 5px;
+}
+
+.syllabus-tab.selected {
+  border-color: #cbb9ed;
+  background: #eee7fa;
+  color: #705b9b;
+}
+
+.syllabus-progress-card {
+  padding: 22px;
+  border-radius: 18px;
+  border: 1px solid #eae2f4;
+  background: linear-gradient(115deg, #f0eafb, #faf0f5);
+}
+
+.syllabus-progress-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.syllabus-progress-top h2 {
+  margin: 8px 0 0;
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: 32px;
+}
+
+.syllabus-progress-top h2 span {
+  font-family: "DM Sans", sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  color: #857b96;
+}
+
+.syllabus-count {
+  display: flex;
+  flex-direction: column;
+  text-align: right;
+  gap: 4px;
+}
+
+.syllabus-count strong {
+  font-size: 22px;
+}
+
+.syllabus-count small {
+  font-size: 10px;
+  color: #857b96;
+}
+
+.syllabus-progress-card > p {
+  margin: 12px 0 0;
+  color: #857b96;
+  font-size: 11px;
+}
+
+.add-chapter-card {
+  margin-top: 22px;
+  padding: 22px;
+  border: 1px solid #eee8f2;
+  border-radius: 18px;
+  background: #fff;
+}
+
+.add-chapter-card h2,
+.chapter-list-heading h2 {
+  margin: 0;
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: 22px;
+}
+
+.add-chapter-card > p {
+  margin: 8px 0 17px;
+  color: #8c8497;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.add-chapter-form {
+  display: flex;
+  gap: 10px;
+}
+
+.add-chapter-form input {
+  min-width: 0;
+  flex: 1;
+  padding: 12px 13px;
+  border: 1px solid #e6dfed;
+  border-radius: 11px;
+  background: #fcfbfd;
+  color: #38334b;
+  font-size: 12px;
+}
+
+.add-chapter-form input:focus {
+  outline: 2px solid #cbb9ed;
+  outline-offset: 1px;
+}
+
+.primary-button {
+  border: 0;
+  border-radius: 11px;
+  padding: 12px 15px;
+  background: #8e79bc;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.primary-button:hover {
+  background: #7d68aa;
+}
+
+.chapter-list-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 30px 0 15px;
+}
+
+.chapter-list-heading .eyebrow {
+  margin-bottom: 6px;
+}
+
+.chapter-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.chapter-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 15px;
+  border: 1px solid #eee8f2;
+  border-radius: 15px;
+  background: #fff;
+  min-width: 0;
+}
+
+.chapter-symbol {
+  display: grid;
+  place-items: center;
+  flex: 0 0 34px;
+  width: 34px;
+  height: 34px;
+  border-radius: 11px;
+  background: #f0eafb;
+  color: #8a76b8;
+  font-size: 16px;
+}
+
+.chapter-row:has(.status-revised) .chapter-symbol {
+  background: #e6f2e8;
+  color: #578361;
+}
+
+.chapter-details {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+
+.chapter-details strong {
+  overflow-wrap: anywhere;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.chapter-details small {
+  color: #9991a2;
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.status-select {
+  max-width: 135px;
+  min-width: 105px;
+  padding: 9px 7px;
+  border: 1px solid #e7e0ed;
+  border-radius: 9px;
+  background: #faf8fc;
+  color: #766987;
+  font-size: 10px;
+}
+
+.status-learning {
+  background: #fff4df;
+  border-color: #f0e2c2;
+}
+
+.status-practising {
+  background: #e9f0ff;
+  border-color: #d8e3fa;
+}
+
+.status-revised {
+  background: #e7f3e9;
+  border-color: #d5e8d8;
+  color: #477450;
+}
+
+.delete-chapter {
+  flex: 0 0 28px;
+  width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #aa94a5;
+  font-size: 22px;
+  cursor: pointer;
+}
+
+.delete-chapter:hover {
+  background: #fff0f0;
+  color: #a54f4f;
+}
+
+.empty-chapters {
+  padding: 34px 20px;
+  border: 1px dashed #ded4eb;
+  border-radius: 17px;
+  text-align: center;
+  background: #fdfbff;
+}
+
+.empty-chapters > span {
+  font-size: 30px;
+}
+
+.empty-chapters h3 {
+  margin: 12px 0 8px;
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: 19px;
+}
+
+.empty-chapters p {
+  max-width: 300px;
+  margin: 0 auto;
+  color: #8b8297;
+  font-size: 11px;
+  line-height: 1.8;
+}
+
+.syllabus-footnote {
+  margin-top: 20px;
+  color: #9991a2;
+  font-size: 10px;
+  line-height: 1.8;
+}
+
+@media (max-width: 600px) {
+  .app-navigation {
+    padding-top: 12px;
+  }
+
+  .syllabus-page {
+    padding-top: 27px;
+  }
+
+  .add-chapter-form {
+    flex-direction: column;
+  }
+
+  .primary-button {
+    min-height: 43px;
+  }
+
+  .chapter-row {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .chapter-details {
+    flex-basis: calc(100% - 55px);
+  }
+
+  .status-select {
+    flex: 1;
+    max-width: none;
+    margin-left: 44px;
+  }
+
+  .delete-chapter {
+    margin-left: auto;
+  }
+
+  .syllabus-tab {
+    font-size: 11px;
+  }
+}

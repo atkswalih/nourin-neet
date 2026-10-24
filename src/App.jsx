@@ -1,6 +1,6 @@
-
 import { useEffect, useMemo, useState } from "react";
-import { db, seedInitialTasks } from "./db";
+import { db, seedInitialTasks, seedOfficialSyllabus } from "./db";
+import { syllabus } from "./syllabus";
 import "./App.css";
 
 const subjects = [
@@ -32,6 +32,8 @@ function App() {
     async function loadData() {
       try {
         await seedInitialTasks(initialTasks);
+        await seedOfficialSyllabus(syllabus);
+
         const [savedTasks, savedChapters] = await Promise.all([
           db.tasks.toArray(),
           db.chapters.toArray(),
